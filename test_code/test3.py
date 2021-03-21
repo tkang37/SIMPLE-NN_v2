@@ -46,15 +46,24 @@ idx=2
 """
 result = descriptor._init_result(type_num, structure_tags, structure_weights, idx, atom_i)
 
+print("1. chcek if 'x', 'dx', 'da', 'params' is empty dictionary")
 print 'x: ',result['x']
 print 'dx: ', result['dx']
 print 'da: ', result['da']
 print 'params: ', result['params']
+
+print("\n2. check if 'N' has correct element types and atom number for each elements")
 print 'N: ', result['N']
+
+print("\n3. check if 'tot_num' has total atom number")
 print 'tot_num: ', result['tot_num']
 print 'partition: ', result['partition']
+
+print("\n4. check if 'struct_type', 'struct_weight' has correct tag, weight with correspond to idx (we set in previous setting # 3)")
 print 'struct_type: ', result['struct_type']
 print 'struct_weight: ', result['struct_weight']
+
+print("\n5. check if 'atom_idx' set correctly")
 prev=0
 end=0
 for elem in result['N']:

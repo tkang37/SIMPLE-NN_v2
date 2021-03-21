@@ -42,14 +42,21 @@ cart_p, scale_p, cell_p, atom_num, atom_i, atom_i_p, type_num, type_idx = descri
 jtem = 'Te'
 cal_num, cal_atoms_p, x, dx, da, x_p, dx_p, da_p = descriptor._init_sf_variables(type_idx, jtem, symf_params_set, atom_num, mpi_range = None )
 
+print('1. check if "jtem" atom number is correct')
 print 'cal_num: ', cal_num
+
+print('\n2. check if "jtem" atom idx is correct)')
 print('cal_atom_p: '),
 for i in range(cal_num):
     print(cal_atoms_p[i]),
 print
+
+print("\n3. check if 'x', 'dx', 'da' is initialze to 0")
 print 'x', x
 print 'dx', dx
 print 'da', da
+
+print("\n4. check if 'x_p', 'dx_p', 'da_p' is initialize to 0")
 for i in range(cal_num):
     for j in range(symf_params_set[jtem]['num']):
         if x_p[i][j] != 0 :

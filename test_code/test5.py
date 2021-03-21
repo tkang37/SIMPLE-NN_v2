@@ -50,15 +50,14 @@ errno = lib.calculate_sf(cell_p, cart_p, scale_p, atom_i_p, atom_num,\
 """ Main test code
 
     Test _set_result()
-    1. check if "jtem" atom number is correct
-    2. check if "jtem" atom idx is correct
-    3. check if 'x', 'dx', 'da' is initialze to 0
-    4. check if 'x_p', 'dx_p', 'da_p' is initialize to 0
+    1. check if 'N', 'tot_num', 'partition', 'struct_type', 'struct_weight' is identical to test3 results
+    2. check if partition_XX is correct
+    3. check if 'x', 'dx', 'da' has available values (didn't check if has identical values)
 
 """
-
 result = descriptor._set_result(result, x, dx, da, type_num, jtem, symf_params_set, atom_num)
-print(result.keys())
+
+print("1. check if 'N', 'tot_num', 'partition', 'struct_type', 'struct_weight', 'atom_idx' are identical to test3 results")
 print 'N: ', result['N']
 print 'tot_num: ', result['tot_num']
 print 'partition: ', result['partition']
@@ -70,5 +69,11 @@ for elem in result['N']:
     end += result['N'][elem]
     print 'result["N"][%s] atom_idx: '%elem, result['atom_idx'][prev:end], len(result['atom_idx'][prev:end])
     prev += result['N'][elem]
+
+print("\n2. check if partition_XX is correct")
 print 'partition_%s: '%jtem, result['partition_%s'%jtem]
-print(result['x'])
+
+print("\n3. check if 'x', 'dx', 'da' has available values (didn't check if has identical values)")
+print 'x: ', result['x']['Sb']
+print'dx: ', result['dx']['Sb'][0]
+print'da: ', result['da']['Sb'][0]

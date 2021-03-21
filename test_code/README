@@ -1,0 +1,11 @@
+test1.py : test _parsing_symf_params()
+test2.py : test _get_structure_info()
+ > remove arguments "structure_tags", "structure_weights"
+ > how about change variable "atom_i" to "atom_idx"?
+ > cart_p values different for each trials...
+test3.py : test _init_result()
+test4.py : test _init_sf_variables()
+ > I think at line 217, elif -> else is better
+test5.py : test _set_result()
+ > Because test2.py results are different for each trials,
+ test5.py results are also different for each trials...

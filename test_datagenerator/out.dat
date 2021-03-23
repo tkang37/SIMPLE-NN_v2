@@ -1,0 +1,63 @@
+Checking parameters to use
+INPUTS
+params    : {'Ge': 'params_Ge', 'Sb': 'params_Sb', 'Te': 'params_Te'}
+refdata_format    : vasp-out
+compress_outcar    : True
+data_per_tfrecord    : 6000
+valid_rate    : 0.1
+shuffle    : True
+add_NNP_ref    : False
+remain_pickle    : True
+continue    : False
+add_atom_idx    : True
+num_parallel_calls    : 40
+atomic_weights    : {'type': None, 'params': {}}
+weight_modifier    : {'type': None, 'params': {}}
+scale_type    : minmax
+scale_scale    : 1.0
+scale_rho    : None
+
+STRUCTURE_LIST   :  ./str_list
+PICKLE_LIST   : ./pickle_list
+Checking parameters DONE
+
+Datagenerator.__init__() test
+Datagenerator.__init__() OK
+
+Datagenerator.parse_structure_list() test
+structures   : [['./generate/OUTCAR_1', '::3'], ['./generate/OUTCAR_2', '::'], ['./generate/OUTCAR_3', '::']]
+structure_tag_idx   : [1, 2, 3]
+structure_tags   : ['None', 'OUTCAR1', 'OUTCAR2', 'OUTCAR3']
+structure_weights   : [1.0, 1.0, 3.0, 3.0]
+Datagenerator.parse_structure_list() OK
+
+Datagenerator._get_tag_and_weight() test
+Main text   :   OUTCAR1
+Tag         :  OUTCAR1
+Weight      :   1.0
+
+Main text   :   OUTCAR2:3
+Tag         :  OUTCAR2
+Weight      :   3.0
+
+Main text   :   OUTCAR3 : 3
+Tag         :  OUTCAR3
+Weight      :   3.0
+
+Datagenerator._get_tag_and_weight() OK
+
+Datagenerator.load_snapshots() test
+Main text   :   OUTCAR1
+Tag         :  OUTCAR1
+Weight      :   1.0
+
+Main text   :   OUTCAR2:3
+Tag         :  OUTCAR2
+Weight      :   3.0
+
+Main text   :   OUTCAR3 : 3
+Tag         :  OUTCAR3
+Weight      :   3.0
+
+Datagenerator._get_tag_and_weight OK
+

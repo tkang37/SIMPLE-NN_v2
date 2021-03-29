@@ -40,4 +40,11 @@
     - Check if "jtem" atom idx is correct
     - Check if 'x', 'dx', 'da' is initialze to 0
 
-test5.py : test _set_result()
+5. _set_result.py : test _set_result()
+*Setting
+    set OUTCAR file path in "FILE" variable in [_init_sf_variables.py] in line 33
+*Output
+    - Check if 'N', 'tot_num', 'struct_type', 'struct_weight' is identical to test3 results
+    - Check if 'x', 'dx', 'da' has available values (didn't check if has identical values)
+    - Check if 'E', 'F', 'S' value extract correctly
+

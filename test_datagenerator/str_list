@@ -1,7 +1,0 @@
-[OUTCAR1]
-./generate/OUTCAR_1 ::3
-[OUTCAR2:3]
-./generate/OUTCAR_11 ::
-[OUTCAR3 : 3]
-./generate/OUTCAR_111 ::
-

@@ -20,14 +20,12 @@ descriptor.set_inputs()
 """
 # 1. load snapshot
 from ase import io
-FILE = '../test_data/generate/OUTCAR_2'
+FILE = './test_data/generate/OUTCAR_2'
 snapshots = io.read(FILE, index='::', format='vasp-out')
 snapshot = snapshots[0]
 
 # 2. extract from _get_structure_info()
-structure_tags=None
-structure_weights=None
-cart_p, scale_p, cell_p, atom_num, atom_i, atom_i_p, type_num, type_idx = descriptor._get_structrue_info(snapshot, structure_tags, structure_weights)
+atom_num, atom_type_idx, type_num, type_atom_idx, cart, scale, cell = descriptor._get_structure_info(snapshot)
 
 # 3. set example variables
 structure_tags = ['None', 'Data1', 'Data2', 'Data3']
@@ -40,11 +38,11 @@ idx=2
    1. chcek if 'x', 'dx', 'da', 'params' is empty dictionary
    2. check if 'N' has correct element types and atom number for each elements
    3. check if 'tot_num' has total atom number
-   4. check if 'struct_type', 'struct_weight' has correct tag, weight with correspond to idx (we set in previous setting # 3)
+   4. check if 'struct_type', 'struct_weight' has correct tag, weight with correspond to idx
    5. check if 'atom_idx' set correctly
 
 """
-result = descriptor._init_result(type_num, structure_tags, structure_weights, idx, atom_i)
+result = descriptor._init_result(type_num, structure_tags, structure_weights, idx, atom_type_idx)
 
 print("1. chcek if 'x', 'dx', 'da', 'params' is empty dictionary")
 print 'x: ',result['x']
@@ -57,9 +55,10 @@ print 'N: ', result['N']
 
 print("\n3. check if 'tot_num' has total atom number")
 print 'tot_num: ', result['tot_num']
-print 'partition: ', result['partition']
+#print 'partition: ', result['partition']
 
 print("\n4. check if 'struct_type', 'struct_weight' has correct tag, weight with correspond to idx (we set in previous setting # 3)")
+print'For structure tag: ', structure_tags, ', structure weights: ', structure_weights, ', index: %s'%idx
 print 'struct_type: ', result['struct_type']
 print 'struct_weight: ', result['struct_weight']
 

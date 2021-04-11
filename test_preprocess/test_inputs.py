@@ -22,7 +22,8 @@ logfile = sys.stdout
 logfile = open('LOG', 'w', 10)
 inputs = initialize_inputs('input.yaml', logfile)
 print('KEY of input.yaml')
-print(inputs.keys())
+for key in inputs.keys():
+    print(key,'   :   ',inputs[key])
 print('')
 print('KEY of symmeytry_function')
 for key in inputs['symmetry_function'].keys():

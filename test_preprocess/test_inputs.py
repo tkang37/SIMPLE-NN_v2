@@ -13,7 +13,6 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 #os.system('python libsymf_builder.py')
 
-from simple_nn_v2 import run
 from simple_nn_v2.init_inputs import  initialize_inputs
 
 

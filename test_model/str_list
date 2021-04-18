@@ -1,0 +1,7 @@
+[OUTCAR1]
+../test_data/OUTCAR_1 ::3
+[OUTCAR2:3]
+../test_data/OUTCAR_11 ::
+[OUTCAR3 : 3]
+../test_data/OUTCAR_111 ::
+

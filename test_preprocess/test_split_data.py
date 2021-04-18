@@ -32,10 +32,12 @@ try:
     print('VALID_RATE :  ', inputs['symmetry_function']['valid_rate'])
     pickle_list = './pickle_list'
     print('NEED pickle_list file  : '+pickle_list)
-    tmp_pickle_train, tmp_pickle_valid = _split_data(inputs, pickle_list)
+    _split_data(inputs, pickle_list)
     print('_split_data OK')
-    print('TMP_PICKLE_TRAIN  ',tmp_pickle_train)
-    print('TMP_PICKLE_VALID  ',tmp_pickle_valid)
+    print('TMP_PICKLE_TRAIN  ',inputs['symmetry_function']['train_list'])
+    os.system('cat {0}'.format(inputs['symmetry_function']['train_list']))
+    print('TMP_PICKLE_VALID  ',inputs['symmetry_function']['valid_list'])
+    os.system('cat {0}'.format(inputs['symmetry_function']['train_list']))
     print('')
 except:
     print('!!  Error occured _split_data ')

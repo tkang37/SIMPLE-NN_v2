@@ -24,12 +24,12 @@ inputs = initialize_inputs('input.yaml', logfile)
 
 
 try:
-    print('preprocess & _dump_all test')
+    print('preprocess test')
     preprocess(inputs, logfile, get_atomic_weights=None)
-    print('preprocess & _dump_all OK')
+    print('preprocess  OK')
     print('')
 except:
-    print('!!  Error occured preprocess & _dump_all')
+    print('!!  Error occured preprocess ')
     print(sys.exc_info())
     print('')
 

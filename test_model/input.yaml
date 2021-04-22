@@ -39,7 +39,7 @@ neural_network:
   save_interval: 200
   show_interval: 200
   test: false
-  total_iteration: 50000
+  total_iteration: 1000
   train: true
   use_force: true
   use_stress: true

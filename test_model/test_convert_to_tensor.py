@@ -39,7 +39,7 @@ try:
     print('PCA  :', pca)
     print('')
 except:
-    print('!!  Error occured _calculate_PCA_sacle')
+    print('!!  Error occured _convert_to_tensor')
     print(sys.exc_info())
     print('')
 

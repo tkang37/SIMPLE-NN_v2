@@ -29,9 +29,9 @@ print('Generate done')
 preprocess(inputs, logfile)
 print('Preprocess done')
 
+run_model(inputs, logfile)
 try:
     print('run_model test')
-    run_model(inputs, logfile)
     print('rum_model OK')
     print('')
 except:

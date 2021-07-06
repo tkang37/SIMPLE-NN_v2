@@ -29,7 +29,11 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install pytest 
         pip install -r .github/workflows/requirements.txt
-    - name: Test with pytest
+    - name: make symmetry function module
+      run: |
+        cp simple_nn_v2/features/symmetry_function/libsymf_builder.py ./
+        python libsymf_builder.py
+    - name: test with pytest
       run: |
         pytest
 

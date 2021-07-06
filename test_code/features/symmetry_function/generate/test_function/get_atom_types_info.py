@@ -1,3 +1,4 @@
+import os
 import sys
 sys.path.append('../../../../../')
 
@@ -19,9 +20,9 @@ atom_types = inputs['atom_types']
 """
 from ase import io
 ########## Set This Variable ###########
-FILE = '../../../../test_data/SiO2/OUTCAR_comp'
+FILE = './OUTCAR_comp'
 ########################################
-structures = io.read(FILE, index='::', format='vasp-out', force_consistent=True)
+structures = io.read(FILE, index='::', format='vasp-out')#, force_consistent=True)
 structure = structures[0]
 
 """ Main test code
@@ -42,13 +43,57 @@ atom_num, atom_type_idx, atoms_per_type, atom_idx_per_type = generating._get_ato
 
 print('1. check if "atom_num" is total atom number')
 print('atom num: %s\n'%atom_num)
+if atom_num != structure.get_global_number_of_atoms():
+    print("Error occured : different value for total atom number {0} {1}. aborting.".format(atom_num,structure.get_global_number_of_atoms()))
+    os.abort()
 
-print('2. check if "atom_type_idx" is total atom number')
-print('atom_type_idx: %s\n'%atom_type_idx)
-
-print('3. check "atoms_per_type" has correct element types and atom number for each elements')
+print('2. check "atoms_per_type" has correct element types and atom number for each elements')
 print('atoms_per_type: %s\n'%atoms_per_type)
+import re
+tmp_formula =  "Si24O48" #Answer for OUTCAR_comp
+type_reg = re.compile(r'[a-zA-Z]+')
+number_reg = re.compile(r'\d+')
+type_list = type_reg.findall(tmp_formula)
+number_list = number_reg.findall(tmp_formula)
+
+try: #Check well match with ase module
+    for idx, item in enumerate(atoms_per_type.keys()):
+        if item in atoms_per_type: #key exist check
+            assert atoms_per_type[item] == int(number_list[idx])
+        else:
+            raise Exception(f"No atom type ({item}) in atoms_per_type.")
+except AssertionError:
+    print("Error occured : different value for atoms_per_type: {0} with {1} {2}. aborting".format(item,atoms_per_type[item],number_list[idx]))
+    os.abort()
+except:
+    print("Error occured. aborting")
+    os.abort()
+
+
+
+print('3. check if "atom_type_idx" is total atom number')
+print('atom_type_idx: %s\n'%atom_type_idx)
+#Use ase.get_atomic_numbers to check 
+tmp_type_idx = structure.get_atomic_numbers()
+number_dict  = {'Si':14,'O': 8} #Atomic type to numbe
+index_dict   = {1:'Si', 2:'O'} #Atomic index to type
+try:
+    for idx in range(len(atom_type_idx)):
+        assert number_dict[index_dict[atom_type_idx[idx]]] == int(tmp_type_idx[idx])
+except:
+    print(f"Error occured : wrong atom type index matching: {idx}")
+    os.abort()
+
 
 print('4. check if "atom_idx_per_type" is total atom number')
 print('atom_idx_per_type: %s\n'%atom_idx_per_type)
+try:
+    tmp_idx = 0
+    for idx, atom_type in enumerate(type_list):
+        assert atom_idx_per_type[atom_type][-1] == (int(number_list[idx])-1+tmp_idx)
+        tmp_idx += int(number_list[idx])
+except:
+    print(f"Error occured : wrong atom_idx_per_type : {atom_type} ")
+    os.abort()
+
 

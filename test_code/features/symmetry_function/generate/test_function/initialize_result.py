@@ -1,3 +1,4 @@
+import os
 import sys
 sys.path.append('../../../../../')
 
@@ -46,28 +47,62 @@ idx=2
 
 """
 result = generating._initialize_result(atoms_per_type, structure_tags, structure_weights, idx, atom_type_idx)
+check_list = ['x','dx','da','N','tot_num','struct_type','struct_weight']
+
+
 
 print("1. chcek if 'x', 'dx', 'da', 'params' is empty dictionary")
-print 'x: ',result['x']
-print 'dx: ', result['dx']
-print 'da: ', result['da']
+for idx in range(3):
+    if not result[check_list[idx]]:
+        print(f'{idx} is empty : ', result[check_list[idx]])
+    else:
+        print(f'{idx} is not  empty : ', result[check_list[idx]] , ' Aborting.')
+        os.abort()
 
 print("\n2. check if 'N' has correct element types and atom number for each elements")
-print 'N: ', result['N']
-
+print('N: ', result['N'])
+#Correct answer
+ans_dict = {'Si':24, 'O':48}
+try:
+    if result['N'].keys() == ans_dict.keys():
+        for atype in list(ans_dict.keys()):
+            assert ans_dict[atype] == result['N'][atype]
+    else:
+        raise Exception("Not same keys in result")
+except AssertionError:
+    print(f"Error occured : not same atom number in initialize_result : {atype}")
+    os.abort()
+except:
+    print(f"Error occured: Aborting")
+    os.abort()
+    
 print("\n3. check if 'tot_num' has total atom number")
-print 'tot_num: ', result['tot_num']
-#print 'partition: ', result['partition']
+print('tot_num: ', result['tot_num'])
+#Totam number 72
+try:
+    assert result['tot_num'] == 72
+except AssertionError:
+    print("Error occured : wrong total number in initialize_result : {0}, {1}".format(result['tot_num'],72))
+    os.abort()
 
-print("\n4. check if 'struct_type', 'struct_weight' has correct tag, weight with correspond to idx (we set in previous setting # 3)")
-print'For structure tag: ', structure_tags, ', structure weights: ', structure_weights, ', index: %s'%idx
-print 'struct_type: ', result['struct_type']
-print 'struct_weight: ', result['struct_weight']
+#?
+print("\n4. check if 'struct_type', 'struct_weight' has correct tag, weight with correspond to idx(we set in previous setting # 3)")
+print('For structure tag: ', structure_tags, ', structure weights: ', structure_weights, ', index: %s'%idx)
+print('struct_type: ', result['struct_type'])
+print('struct_weight: ', result['struct_weight'])
 
 print("\n5. check if 'atom_idx' set correctly")
 prev=0
 end=0
 for elem in result['N']:
     end += result['N'][elem]
-    print 'result["N"][%s] atom_idx: '%elem, result['atom_idx'][prev:end], len(result['atom_idx'][prev:end])
+    print('result["N"][%s] atom_idx: '%elem, result['atom_idx'][prev:end], len(result['atom_idx'][prev:end]))
     prev += result['N'][elem]
+
+try:
+    for atype in ans_dict:
+        for idx in result['N'][atype]:
+            assert ans_dict[atype] == int(result['atom_idx'][atype])
+except AssertionError:
+    print("Error occured : incorrect atom inddex in initialize_result")
+    os.abort()

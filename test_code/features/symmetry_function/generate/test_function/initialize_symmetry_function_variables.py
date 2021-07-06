@@ -1,3 +1,4 @@
+import os
 import sys
 sys.path.append('../../../../../')
 
@@ -23,14 +24,13 @@ atom_types = inputs['atom_types']
 symf_params_set = symf_utils._parse_symmetry_function_parameters(inputs, atom_types)
 
 from ase import io
-FILE = '../../../../test_data/SiO2/OUTCAR_comp'
+FILE = './OUTCAR_comp'
 structures = io.read(FILE, index=':2:', format='vasp-out')
 structure = structures[0]
 structure_tags = ['Data1', 'Data2', 'Data3']
 structure_weights = [1, 3, 3]
 cell, cart, scale = generating._get_structure_coordination_info(structure)
 atom_num, atom_type_idx, atoms_per_type, atom_idx_per_type = generating._get_atom_types_info(structure, atom_types)
-
 
 """ Main test code
 
@@ -40,42 +40,56 @@ atom_num, atom_type_idx, atoms_per_type, atom_idx_per_type = generating._get_ato
     3. check if 'x', 'dx', 'da' is initialze to 0
 
 """
+
 jtem = 'Si'
 cal_atom_idx, cal_atom_num, x, dx, da = generating._initialize_symmetry_function_variables(atom_idx_per_type, jtem, symf_params_set, atom_num, mpi_range = None )
 
 print('1. check if "jtem" atom number is correct')
-print 'cal_num: ', cal_atom_num
+print(f'{jtem} cal_num: ', cal_atom_num )
+try:
+    assert cal_atom_num == 24
+except AssertionError:
+    print(f"Error occured : {jtem} cal_atom_num wrong")
+    os.abort()
 
 print('\n2. check if "%s" atom idx is correct)'%jtem)
-print('cal_atom_idx: '),
-for i in range(cal_atom_num):
-    print(cal_atom_idx[i]),
-print
+print('cal_atom_idx: ')
+tmp_str =  ""
+try:
+    for i in range(cal_atom_num):
+        tmp_str += " "+str(cal_atom_idx[i])
+        assert i == cal_atom_idx[i]
+    print(tmp_str)
+except AssertionError:
+    print(f"Error occured : wrong {jtem} index")
+    os.abort()    
 
 print("\n3. check if 'x', 'dx', 'da' is initialze to 0")
-x_e = False
-dx_e = False
-da_e = False
-for i in range(len(x)):
-    for j in range(len(x[i])):
-        if x[i][j] != 0:
-            x_e = True
-            print("%sth atom's %sth x value initialize not correctly"%(i+1, j+1))
-if not x_e:
-    print"x initialize ok"
 
-for i in range(len(dx)):
-    for j in range(len(dx[i])):
-        if dx[i][j] != 0:
-            dx_e = True
-            print("%sth atom's %sth dx value initialize not correctly"%(i+1, j+1))
-if not dx_e:
-    print"dx initialize ok"
 
-for i in range(len(da)):
-    for j in range(len(da[i])):
-        if da[i][j] != 0:
-            da_e = True
-            print("%sth atom's %sth da value initialize not correctly"%(i+1, j+1))
-if not da_e:
-    print"da initialize ok"
+
+try:
+    print("checking x")
+    item = "x"
+    for i in range(len(x)):
+        for j in range(len(x[i])):
+            assert x[i][j] == 0
+    print("x initialize ok")
+
+    print("checking dx")
+    item = "dx"
+    for i in range(len(dx)):
+        for j in range(len(dx[i])):
+            assert dx[i][j] == 0
+    print("dx initialize ok")
+
+    print("checking da")
+    item = "da"
+    for i in range(len(da)):
+        for j in range(len(da[i])):
+            assert da[i][j] == 0
+    print("da initialize ok")
+
+except AssertionError:
+    print(f"Error occured : {i+1} th atom's {j+1} th {item} value initialize not correctly")
+    os.abort()

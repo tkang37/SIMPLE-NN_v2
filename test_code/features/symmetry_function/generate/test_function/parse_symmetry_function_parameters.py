@@ -26,8 +26,8 @@ print
 
 for elem in symf_params_set.keys():
     print("Check symf_params_set[%s]"%elem)
-    print"keys: ", symf_params_set[elem].keys()
-    print"['num']: ", symf_params_set[elem]['num']
+    print("keys: ", symf_params_set[elem].keys())
+    print("['num']: ", symf_params_set[elem]['num'])
 
     # Check ['total'], ['int'], ['double'] values
     f=open('params_%s'%elem,'r')
@@ -53,11 +53,11 @@ for elem in symf_params_set.keys():
                     print('ValueError in key: d  elem: ', elem, '  ',i+1,'th symf, ',j+1, 'th value')
                     d_e = True
     if not tot_e:
-        print "['total']: ok"
+        print("['total']: ok")
     if not i_e:
-        print "['int']: ok"
+        print("['int']: ok")
     if not d_e:
-        print "['double']: ok"
+        print("['double']: ok")
 
     print
 

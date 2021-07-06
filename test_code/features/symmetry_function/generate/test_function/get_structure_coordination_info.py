@@ -1,6 +1,6 @@
+import os
 import sys
 sys.path.append('../../../../../')
-
 from simple_nn_v2 import simple_nn
 from simple_nn_v2.init_inputs import initialize_inputs
 from simple_nn_v2.features.symmetry_function import generating
@@ -19,9 +19,9 @@ atom_types = inputs['atom_types']
 """
 from ase import io
 ########## Set This Variable ###########
-FILE = '../../../../test_data/SiO2/OUTCAR_comp'
+FILE = './OUTCAR_comp'
 ########################################
-structures = io.read(FILE, index='::', format='vasp-out', force_consistent=True)
+structures = io.read(FILE, index='::', format='vasp-out')#, force_consistent=True)
 structure = structures[0]
 
 """ Main test code
@@ -49,27 +49,32 @@ for i in range(3):
     print(cell[i][0], cell[i][1], cell[i][2])
     for j in range(3):
         if cell[i][j] != cell_comp[i][j]:
-            print("%s, %s index lattice parameter has wrong values"%(i, j))
+            print("Error : %s, %s index lattice parameter has wrong values, aborting."%(i, j))
+            os.abort()
+            
 
-print('\n2. check Cartesian coordination in "cart" (first 5, last 5 coordination)')
+import numpy 
+print('\n2. check Cartesian coordination in "cart" (random 10 coordinations)')
+rand_idx = list()
+while len(rand_idx) != 10:
+    tmp_idx = numpy.random.randint(len(cart)) 
+    if tmp_idx not in rand_idx:
+        rand_idx.append(tmp_idx)
+print('Generated random index : ',rand_idx)
+
 print('Cartesian coordination')
-for i in range(len(cart)):
-    if i <5 or i>=len(cart)-5:
-        print cart[i][0], cart[i][1], cart[i][2]
-    if i == 5:
-        print('...')
-    for j in range(3):
-        if cart[i][j] != cart_comp[i][j]:
+for idx in rand_idx:
+    print(f'IDX {idx} : ',cart[idx][0], cart[idx][1], cart[idx][2])
+    for xyz in range(3):
+        if cart[idx][xyz] != cart_comp[idx][xyz]:
             print("%s th atom's %s th cartesian coordination has wrong values"%(i+1, j))
 
-print('\n3. check Fractional coordination in "cart_p" (first 5, last 5 coordination)')
+print('\n3. check Fractional coordination in "cart_p" (random 10 coordinations)')
 print('Fractional coordination')
-for i in range(len(scale)):
-    if i <5 or i>=len(scale)-5:
-        print scale[i][0], scale[i][1], scale[i][2]
-    if i == 5:
-        print('...')
-    for j in range(3):
-        if scale[i][j] != scale_comp[i][j]:
-            print("%s th atom's %s th fractional coordination has wrong values"%(i+1, j))
+for idx in rand_idx:
+    print(f'IDX {idx} : ',scale[idx][0], scale[idx][1], scale[idx][2])
+    for xyz in range(3):
+        if scale[idx][xyz] != scale_comp[idx][xyz]:
+            print("Error : %s th atom's %s th fractional coordination has wrong values"%(i+1, j))
+            os.abort()
 

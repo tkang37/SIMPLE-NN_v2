@@ -1,7 +1,7 @@
 import os
 import sys
-sys.path.append('../../../../../')
-
+#sys.path.append('../../../../../')
+sys.path.append('./')
 from simple_nn_v2 import simple_nn
 from simple_nn_v2.init_inputs import initialize_inputs
 from simple_nn_v2.features.symmetry_function import generating
@@ -9,9 +9,10 @@ from simple_nn_v2.features.symmetry_function import utils as symf_utils
 
 # Minimum Setting for Testing Symmetry_function methods
 # Initialize input file, set Simple_nn object as parent of Symmetry_function object
-
+rootdir='./'
+rootdir='./test_input/'
 logfile = open('LOG', 'w', 10)
-inputs = initialize_inputs('./input.yaml', logfile)
+inputs = initialize_inputs(rootdir+'input_SiO.yaml', logfile)
 atom_types = inputs['atom_types']
 
 """ Previous setting before test code
@@ -24,7 +25,7 @@ atom_types = inputs['atom_types']
 symf_params_set = symf_utils._parse_symmetry_function_parameters(inputs, atom_types)
 
 from ase import io
-FILE = './OUTCAR_comp'
+FILE = rootdir+'OUTCAR_SiO_comp'
 structures = io.read(FILE, index=':2:', format='vasp-out')
 structure = structures[0]
 structure_tags = ['Data1', 'Data2', 'Data3']
@@ -50,6 +51,7 @@ try:
     assert cal_atom_num == 24
 except AssertionError:
     print(f"Error occured : {jtem} cal_atom_num wrong")
+    print(sys.exc_info())
     os.abort()
 
 print('\n2. check if "%s" atom idx is correct)'%jtem)
@@ -62,6 +64,7 @@ try:
     print(tmp_str)
 except AssertionError:
     print(f"Error occured : wrong {jtem} index")
+    print(sys.exc_info())
     os.abort()    
 
 print("\n3. check if 'x', 'dx', 'da' is initialze to 0")
@@ -92,4 +95,5 @@ try:
 
 except AssertionError:
     print(f"Error occured : {i+1} th atom's {j+1} th {item} value initialize not correctly")
+    print(sys.exc_info())
     os.abort()

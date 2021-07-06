@@ -1,6 +1,7 @@
 import os
 import sys
-sys.path.append('../../../../../')
+#sys.path.append('../../../../../')
+sys.path.append('./')
 
 from simple_nn_v2 import simple_nn
 from simple_nn_v2.init_inputs import initialize_inputs
@@ -8,9 +9,10 @@ from simple_nn_v2.features.symmetry_function import generating
 
 # Minimum Setting for Testing Symmetry_function methods
 # Initialize input file, set Simple_nn object as parent of Symmetry_function object
-
+#rootdir = './'
+rootdir = './test_input/'
 logfile = open('LOG', 'w', 10)
-inputs = initialize_inputs('./input.yaml', logfile)
+inputs = initialize_inputs(rootdir+'input_SiO.yaml', logfile)
 atom_types = inputs['atom_types']
 
 """ Previous setting before test code
@@ -20,7 +22,8 @@ atom_types = inputs['atom_types']
 """
 from ase import io
 ########## Set This Variable ###########
-FILE = './OUTCAR_comp'
+#FILE = './OUTCAR_comp'
+FILE =rootdir+'OUTCAR_SiO_comp'
 ########################################
 structures = io.read(FILE, index='::', format='vasp-out')#, force_consistent=True)
 structure = structures[0]
@@ -45,6 +48,7 @@ print('1. check if "atom_num" is total atom number')
 print('atom num: %s\n'%atom_num)
 if atom_num != structure.get_global_number_of_atoms():
     print("Error occured : different value for total atom number {0} {1}. aborting.".format(atom_num,structure.get_global_number_of_atoms()))
+    print(sys.exc_info())
     os.abort()
 
 print('2. check "atoms_per_type" has correct element types and atom number for each elements')
@@ -64,9 +68,11 @@ try: #Check well match with ase module
             raise Exception(f"No atom type ({item}) in atoms_per_type.")
 except AssertionError:
     print("Error occured : different value for atoms_per_type: {0} with {1} {2}. aborting".format(item,atoms_per_type[item],number_list[idx]))
+    print(sys.exc_info())
     os.abort()
 except:
     print("Error occured. aborting")
+    print(sys.exc_info())
     os.abort()
 
 
@@ -82,6 +88,7 @@ try:
         assert number_dict[index_dict[atom_type_idx[idx]]] == int(tmp_type_idx[idx])
 except:
     print(f"Error occured : wrong atom type index matching: {idx}")
+    print(sys.exc_info())
     os.abort()
 
 
@@ -94,6 +101,7 @@ try:
         tmp_idx += int(number_list[idx])
 except:
     print(f"Error occured : wrong atom_idx_per_type : {atom_type} ")
+    print(sys.exc_info())
     os.abort()
 
 

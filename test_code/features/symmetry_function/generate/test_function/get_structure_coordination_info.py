@@ -1,15 +1,23 @@
 import os
 import sys
-sys.path.append('../../../../../')
+#For pytest
+#sys.path.append('../../../../../')
+sys.path.append('./')
 from simple_nn_v2 import simple_nn
 from simple_nn_v2.init_inputs import initialize_inputs
 from simple_nn_v2.features.symmetry_function import generating
+import numpy as np
+from ase import io
 
 # Minimum Setting for Testing Symmetry_function methods
 # Initialize input file, set Simple_nn object as parent of Symmetry_function object
 
+#root_dir = './'
+root_dir = './test_input/'
+
+
 logfile = open('LOG', 'w', 10)
-inputs = initialize_inputs('./input.yaml', logfile)
+inputs = initialize_inputs(root_dir+'input_SiO.yaml', logfile)
 atom_types = inputs['atom_types']
 
 """ Previous setting before test code
@@ -17,9 +25,8 @@ atom_types = inputs['atom_types']
     1. load structure from FILE
 
 """
-from ase import io
 ########## Set This Variable ###########
-FILE = './OUTCAR_comp'
+FILE = root_dir+'OUTCAR_SiO_comp'
 ########################################
 structures = io.read(FILE, index='::', format='vasp-out')#, force_consistent=True)
 structure = structures[0]
@@ -36,7 +43,6 @@ structure = structures[0]
     7. check Fractional coordination in "scale" (first 5, last 5 coordination)
 
 """
-import numpy as np
 
 cell, cart, scale= generating._get_structure_coordination_info(structure)
 cell_comp = np.copy(structure.cell, order='C')
@@ -45,36 +51,45 @@ scale_comp = np.copy(structure.get_scaled_positions(), order='C')
 
 print('1. check lattice parameter')
 print('Lattice parameter')
-for i in range(3):
-    print(cell[i][0], cell[i][1], cell[i][2])
-    for j in range(3):
-        if cell[i][j] != cell_comp[i][j]:
-            print("Error : %s, %s index lattice parameter has wrong values, aborting."%(i, j))
-            os.abort()
+try:
+    for i in range(3):
+        print(cell[i][0], cell[i][1], cell[i][2])
+        for j in range(3):
+            assert cell[i][j] == cell_comp[i][j]
+except AssertionError: 
+    print(f"Error : {i}, {j} index lattice parameter has wrong values, aborting.")
+    sys.exc_info()
+    os.abort()
             
 
-import numpy 
 print('\n2. check Cartesian coordination in "cart" (random 10 coordinations)')
 rand_idx = list()
 while len(rand_idx) != 10:
-    tmp_idx = numpy.random.randint(len(cart)) 
+    tmp_idx = np.random.randint(len(cart)) 
     if tmp_idx not in rand_idx:
         rand_idx.append(tmp_idx)
 print('Generated random index : ',rand_idx)
 
-print('Cartesian coordination')
-for idx in rand_idx:
-    print(f'IDX {idx} : ',cart[idx][0], cart[idx][1], cart[idx][2])
-    for xyz in range(3):
-        if cart[idx][xyz] != cart_comp[idx][xyz]:
-            print("%s th atom's %s th cartesian coordination has wrong values"%(i+1, j))
+try:
+    print('Cartesian coordination')
+    for idx in rand_idx:
+        print(f'IDX {idx} : ',cart[idx][0], cart[idx][1], cart[idx][2])
+        for xyz in range(3):
+            assert cart[idx][xyz] == cart_comp[idx][xyz]
+except AssertionError:
+    print(f"{idx+1} th atom's {xyz} th cartesian coordination has wrong values")
+    sys.exc_info()
+    os.abort()
 
 print('\n3. check Fractional coordination in "cart_p" (random 10 coordinations)')
 print('Fractional coordination')
-for idx in rand_idx:
-    print(f'IDX {idx} : ',scale[idx][0], scale[idx][1], scale[idx][2])
-    for xyz in range(3):
-        if scale[idx][xyz] != scale_comp[idx][xyz]:
-            print("Error : %s th atom's %s th fractional coordination has wrong values"%(i+1, j))
-            os.abort()
+try:
+    for idx in rand_idx:
+        print(f'IDX {idx} : ',scale[idx][0], scale[idx][1], scale[idx][2])
+        for xyz in range(3):
+            assert scale[idx][xyz] == scale_comp[idx][xyz]
+except AssertionError:
+    print(f"Error : {idx+1} th atom's {xyz} th fractional coordination has wrong values")
+    sys.exc_info()
+    os.abort()
 

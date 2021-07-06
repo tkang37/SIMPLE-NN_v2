@@ -1,6 +1,6 @@
 import sys
-sys.path.append('../../../../../')
-
+#sys.path.append('../../../../../')
+sys.path.append('./')
 from simple_nn_v2 import simple_nn
 from simple_nn_v2.init_inputs import initialize_inputs
 from simple_nn_v2.features.symmetry_function import generating
@@ -10,9 +10,10 @@ from simple_nn_v2.utils import features as util_ft
 
 # Minimum Setting for Testing Symmetry_function methods
 # Initialize input file, set Simple_nn object as parent of Symmetry_function object
-
+rootdir='./'
+rootdir='./test_input/'
 logfile = open('LOG', 'w', 10)
-inputs = initialize_inputs('./input.yaml', logfile)
+inputs = initialize_inputs(rootdir+'input_SiO.yaml', logfile)
 atom_types = inputs['atom_types']
 
 """ Previous setting before test code
@@ -31,7 +32,7 @@ for element in atom_types:
 
 # 2. load structure from FILE
 from ase import io
-FILE = '../../../../test_data/SiO2/OUTCAR_comp'
+FILE = rootdir+'OUTCAR_SiO_comp'
 structures = io.read(FILE, index='::', format='vasp-out')
 structure = structures[0]
 structure_tags = ['None', 'Data1', 'Data2', 'Data3']
@@ -73,22 +74,21 @@ generating._set_calculated_result(result, x, dx, da, atoms_per_type, jtem, symf_
 
 print(result)
 print("1. check if 'N', 'tot_num', 'struct_type', 'struct_weight', 'atom_idx' are identical to test3 results")
-print 'N: ', result['N']
-print 'tot_num: ', result['tot_num']
-#print 'partition: ', result['partition']
-print 'struct_type: ', result['struct_type']
-print 'struct_weight: ', result['struct_weight']
+print('N: ', result['N'])
+print('tot_num: ', result['tot_num'])
+print('struct_type: ', result['struct_type'])
+print('struct_weight: ', result['struct_weight'])
 prev=0
 end=0
 for elem in result['N']:
     end += result['N'][elem]
-    print 'result["N"][%s] atom_idx: '%elem, result['atom_idx'][prev:end], len(result['atom_idx'][prev:end])
+    print('result["N"][%s] atom_idx: '%elem, result['atom_idx'][prev:end], len(result['atom_idx'][prev:end]))
     prev += result['N'][elem]
 
 print("\n2. check if 'x', 'dx', 'da' has available values (didn't check if has identical values)")
-print 'x: ', result['x']['Si']
-print'dx: ', result['dx']['Si'][0]
-print'da: ', result['da']['Si'][0]
+print(' x: ', result['x']['Si'])
+print('dx: ', result['dx']['Si'][0])
+print('da: ', result['da']['Si'][0])
 
 
 print("\n3. check if 'E', 'F', 'S' value extract correctly")

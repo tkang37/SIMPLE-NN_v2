@@ -1,6 +1,7 @@
 import os
 import sys
-sys.path.append('../../../../../')
+#sys.path.append('../../../../../')
+sys.path.append('./')
 
 from simple_nn_v2 import simple_nn
 from simple_nn_v2.init_inputs import initialize_inputs
@@ -8,9 +9,10 @@ from simple_nn_v2.features.symmetry_function import generating
 
 # Minimum Setting for Testing Symmetry_function methods
 # Initialize input file, set Simple_nn object as parent of Symmetry_function object
-
+#rootdir = './'
+rootdir = './test_input/'
 logfile = open('LOG', 'w', 10)
-inputs = initialize_inputs('./input.yaml', logfile)
+inputs = initialize_inputs(rootdir+'input_SiO.yaml', logfile)
 atom_types = inputs['atom_types']
 inputs = inputs['descriptor']
 
@@ -23,7 +25,7 @@ inputs = inputs['descriptor']
 """
 # 1. load structure
 from ase import io
-FILE = '../../../../test_data/SiO2/OUTCAR_comp'
+FILE = rootdir+'OUTCAR_SiO_comp'
 structures = io.read(FILE, index=':2:', format='vasp-out')
 structure = structures[0]
 
@@ -71,9 +73,11 @@ try:
         raise Exception("Not same keys in result")
 except AssertionError:
     print(f"Error occured : not same atom number in initialize_result : {atype}")
+    print(sys.exc_info())
     os.abort()
 except:
     print(f"Error occured: Aborting")
+    print(sys.exc_info())
     os.abort()
     
 print("\n3. check if 'tot_num' has total atom number")
@@ -83,6 +87,7 @@ try:
     assert result['tot_num'] == 72
 except AssertionError:
     print("Error occured : wrong total number in initialize_result : {0}, {1}".format(result['tot_num'],72))
+    print(sys.exc_info())
     os.abort()
 
 #?
@@ -99,10 +104,14 @@ for elem in result['N']:
     print('result["N"][%s] atom_idx: '%elem, result['atom_idx'][prev:end], len(result['atom_idx'][prev:end]))
     prev += result['N'][elem]
 
+idx_dict = {'Si':1, 'O':2}
+tmp_idx = 0
 try:
-    for atype in ans_dict:
-        for idx in result['N'][atype]:
-            assert ans_dict[atype] == int(result['atom_idx'][atype])
+    for atype in list(idx_dict.keys()):
+        for idx in range(result['N'][atype]):
+            assert idx_dict[atype] == int(result['atom_idx'][tmp_idx+idx])
+        tmp_idx += result['N'][atype]
 except AssertionError:
     print("Error occured : incorrect atom inddex in initialize_result")
+    print(sys.exc_info())
     os.abort()

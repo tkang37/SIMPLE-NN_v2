@@ -1,0 +1,10 @@
+ase==3.19.0
+braceexpand==0.1.6
+cffi==1.14.5
+matplotlib==2.2.2
+numpy==1.15.0
+scikit-learn==0.24.2
+scipy==1.1.0
+six==1.11.0
+torch==1.9.0
+tqdm==4.60.0

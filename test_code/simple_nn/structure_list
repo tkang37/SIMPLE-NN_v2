@@ -1,6 +1,0 @@
-[Structure label1]
-../test_data/SiO2/OUTCAR_comp :30:10
-[Structure label2]
-../test_data/SiO2/OUTCAR_comp 30:60:10
-[Structure label3]
-../test_data/SiO2/OUTCAR_comp 60:90:10

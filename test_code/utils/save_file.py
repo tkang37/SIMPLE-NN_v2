@@ -34,7 +34,7 @@ print('tmp_filename    :', tmp_filename)
 
 print("load saved data : ./data/data3.pt")
 if os.path.exists('./data/data3.pt'):
-    saved_data = torch.load("./data/data1.pt")
+    saved_data = torch.load("./data/data3.pt")
     assert saved_data['TMP'] == 2 , f"Error occred : not consistant result"
     assert saved_data['DATA'] == 5 , f"Error occred : not consistant result"
 else:

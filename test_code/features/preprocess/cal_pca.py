@@ -29,17 +29,21 @@ print("Checking generated pca match ")
 if np.sum(pca['Si'][0]-pca_match['Si'][0]) < 1E-10:
     print("pca 1st component passed")
 else:
-    raise Exception(f"pca generated different value at 1st component sum : {np.sum(pca['Si'][0]-pca_match['Si'][0])}")
+    print(f"{pca['Si'][0]} \n  {pca_match['Si'][0]}")
+    import sklearn
+    raise Exception(f"pca generated different value at 1st component, sklearn version : {sklearn.__version__}")
 
 if np.sum(pca['Si'][1]-pca_match['Si'][1]) < 1E-10:
     print("pca 2nd component passed")
 else:
-    raise Exception(f"pca generated different value at 2nd component sum : {np.sum(pca['Si'][1]-pca_match['Si'][1])}")
+    print(f"{pca['Si'][1]} \n  {pca_match['Si'][1]}")
+    raise Exception(f"pca generated different value at 2nd component, sklearn version : {sklearn.__version__}")
 
 if np.sum(pca['Si'][2]-pca_match['Si'][2]) < 1E-10:
     print(f"pca 3rd component passed")
 else:
-    raise Exception(f"pca generated different value at 3rd component sum : {np.sum(pca['Si'][2]-pca_match['Si'][2])} ")
+    print(f"{pca['Si'][2]} \n  {pca_match['Si'][2]}")
+    raise Exception(f"pca generated different value at 3rd component, sklearn version : {sklearn.__version__}")
 
 print('_calculate_pca_matrix OK')
 print('')

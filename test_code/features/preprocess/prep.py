@@ -43,7 +43,7 @@ for it in range(4):
     elif match_info == 2:
         raise Exception(f"Error occured : Not same binary file {filelist[it]} with {matchlist[it]}")
     else:
-        raise Exception("Unexpected error occured")
+        raise Exception("Unexpected error occured : code {match_info}")
 
 print('preprocess() OK')
 print('clear generated files in preprocess')

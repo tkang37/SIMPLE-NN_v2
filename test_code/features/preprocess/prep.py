@@ -22,13 +22,13 @@ preprocessing.preprocess(inputs, logfile)
 filelist = [
     'train_list',
     'valid_list',
-    'scale_factor',
+    #'scale_factor',
     #'pca'
     ]
 matchlist = [
     'train_match',
     'valid_match',
-    'scale_match',
+    #'scale_match',
     #'pca_match'
     ]
 
@@ -43,7 +43,7 @@ for it in range(4):
     elif match_info == 2:
         raise Exception(f"Error occured : Not same binary file {filelist[it]} with {matchlist[it]}")
     else:
-        raise Exception("Unexpected error occured : code {match_info}")
+        raise Exception(f"Unexpected error occured : code {match_info}")
 
 print('preprocess() OK')
 print('clear generated files in preprocess')

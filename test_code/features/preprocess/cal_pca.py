@@ -33,22 +33,22 @@ print("pca generate done")
 pca_match = torch.load(f"{rootdir}pca_match")
 print("Checking generated pca match ")
 
-if np.sum(np.abs(pca['Si'][0]-pca_match['Si'][0])) < 1E-10:
-    print(f"pca 1st component passed : {np.sum(np.abs(pca['Si'][0]-pca_match['Si'][0]))}")
+if np.sum(np.abs(pca['Si'][0]-pca_match['Si'][0]))/np.sum(np.abs(pca_match['Si'][0])) < 1E-4:
+    print(f"pca 1st component passed : sum value ratio {np.sum(np.abs(pca['Si'][0]-pca_match['Si'][0]))/np.sum(np.abs(pca_match['Si'][0]))}")
 else:
     print("Difference")
     print(f"{pca['Si'][0] - pca_match['Si'][0]}")
     raise Exception(f"pca generated different value at 1st component, sklearn version : {sklearn.__version__}")
 
-if np.sum(np.abs(pca['Si'][1]-pca_match['Si'][1])) < 1E-10:
-    print(f"pca 2nd component passed : {np.sum(np.abs(pca['Si'][1]-pca_match['Si'][1]))} ")
+if np.sum(np.abs(pca['Si'][1]-pca_match['Si'][1]))/np.sum(np.abs(pca_match['Si'][1])) < 1E-4:
+    print(f"pca 2nd component passed : sum value ratio {np.sum(np.abs(pca['Si'][1]-pca_match['Si'][1]))/np.sum(np.abs(pca_match['Si'][1]))}")
 else:
     print("Difference")
     print(f"{pca['Si'][1] - pca_match['Si'][1]}")
     raise Exception(f"pca generated different value at 2nd component, sklearn version : {sklearn.__version__}")
 
-if np.sum(np.abs(pca['Si'][2]-pca_match['Si'][2])) < 1E-1:
-    print(f"pca 3rd component passed : {np.sum(np.abs(pca['Si'][2]-pca_match['Si'][2]))}")
+if np.sum(np.abs(pca['Si'][2]-pca_match['Si'][2]))/np.sum(np.abs(pca_match['Si'][2])) < 1E-4:
+    print(f"pca 3rd component passed : sum value ratio {np.sum(np.abs(pca['Si'][2]-pca_match['Si'][2]))/np.sum(np.abs(pca_match['Si'][2]))}")
 else:
     print("Difference")
     print(f"{pca['Si'][2] - pca_match['Si'][2]}")

@@ -23,13 +23,13 @@ filelist = [
     'train_list',
     'valid_list',
     'scale_factor',
-    'pca'
+    #'pca'
     ]
 matchlist = [
     'train_match',
     'valid_match',
     'scale_match',
-    'pca_match'
+    #'pca_match'
     ]
 
 print("Match generated files")

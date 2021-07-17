@@ -26,7 +26,7 @@ def test():
     test_list=[
     'split_list.py',
     'cal_scale.py',
-    'cal_pca.py',
+    #'cal_pca.py',
     'prep.py'
     ]
     

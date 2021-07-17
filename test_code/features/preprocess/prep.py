@@ -22,18 +22,18 @@ preprocessing.preprocess(inputs, logfile)
 filelist = [
     'train_list',
     'valid_list',
-    #'scale_factor',
+    'scale_factor',
     #'pca'
     ]
 matchlist = [
     'train_match',
     'valid_match',
-    #'scale_match',
+    'scale_match',
     #'pca_match'
     ]
 
 print("Match generated files")
-for it in range(4):
+for it in range(3):
     print(f"test match {filelist[it]} with {matchlist[it]}")
     match_info = os.system(f"diff ./{filelist[it]} {rootdir}{matchlist[it]}")
     if match_info == 0:

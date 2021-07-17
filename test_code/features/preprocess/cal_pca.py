@@ -4,6 +4,7 @@ sys.path.append('./')
 
 import torch
 import numpy as np
+import sklearn
 
 from simple_nn_v2 import simple_nn
 from simple_nn_v2.init_inputs import initialize_inputs
@@ -23,26 +24,34 @@ print('_calculate_pca_matrix test')
 
 pca = preprocessing._calculate_pca_matrix(inputs, logfile, train_feature_list, scale)
 print("pca generate done")
+
+
+#Saving part
+#torch.save(pca, f"{rootdir}pca_match")
+
+
 pca_match = torch.load(f"{rootdir}pca_match")
 print("Checking generated pca match ")
 
 if np.sum(pca['Si'][0]-pca_match['Si'][0]) < 1E-10:
     print("pca 1st component passed")
 else:
-    print(f"{pca['Si'][0]} \n  {pca_match['Si'][0]}")
-    import sklearn
+    print("Difference")
+    print(f"{pca['Si'][0] - pca_match['Si'][0]}")
     raise Exception(f"pca generated different value at 1st component, sklearn version : {sklearn.__version__}")
 
 if np.sum(pca['Si'][1]-pca_match['Si'][1]) < 1E-10:
     print("pca 2nd component passed")
 else:
-    print(f"{pca['Si'][1]} \n  {pca_match['Si'][1]}")
+    print("Difference")
+    print(f"{pca['Si'][1] - pca_match['Si'][1]}")
     raise Exception(f"pca generated different value at 2nd component, sklearn version : {sklearn.__version__}")
 
 if np.sum(pca['Si'][2]-pca_match['Si'][2]) < 1E-10:
     print(f"pca 3rd component passed")
 else:
-    print(f"{pca['Si'][2]} \n  {pca_match['Si'][2]}")
+    print("Difference")
+    print(f"{pca['Si'][2] - pca_match['Si'][2]}")
     raise Exception(f"pca generated different value at 3rd component, sklearn version : {sklearn.__version__}")
 
 print('_calculate_pca_matrix OK')

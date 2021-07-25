@@ -33,7 +33,7 @@ print("pca generate done")
 pca_match = torch.load(f"{rootdir}pca_match")
 print("Checking generated pca match ")
 
-if (np.abs(pca['Si'][0]-pca_match['Si'][0])  < 1E-10).all():
+if (np.abs(pca['Si'][0][20:]-pca_match['Si'][0][20:])  < 1E-10).all():
     print(f"pca 1st component passed, difference under 1E-10")
 else:
     print("Difference")
@@ -48,7 +48,7 @@ else:
     raise Exception(f"pca generated different value at 2nd component, sklearn version : {sklearn.__version__}")
 
 
-if (np.abs(pca['Si'][2]-pca_match['Si'][2])  < 1E-10).all():
+if (np.abs(pca['Si'][2][:20]-pca_match['Si'][2][:20])  < 1E-10).all():
     print(f"pca 3rd component passed, difference under 1E-10")
 else:
     print("Difference")

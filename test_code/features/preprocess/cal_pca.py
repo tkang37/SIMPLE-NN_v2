@@ -33,26 +33,24 @@ print("pca generate done")
 pca_match = torch.load(f"{rootdir}pca_match")
 print("Checking generated pca match ")
 
-if np.sum(np.abs(pca['Si'][0]-pca_match['Si'][0]))/np.sum(np.abs(pca_match['Si'][0])) < 1:
-    print(f"pca 1st component passed : sum value ratio {np.sum(np.abs(pca['Si'][0]-pca_match['Si'][0]))/np.sum(np.abs(pca_match['Si'][0]))}")
+if not (np.abs(pca['Si'][0]-pca_match['Si'][0])  < 1E-10).all():
+    print(f"pca 1st component passed, difference under 1E-10"})
 else:
-    print(f"Ratio {np.sum(np.abs(pca['Si'][0]-pca_match['Si'][0]))/np.sum(np.abs(pca_match['Si'][0]))}")
     print("Difference")
     print(f"{pca['Si'][0] - pca_match['Si'][0]}")
     raise Exception(f"pca generated different value at 1st component, sklearn version : {sklearn.__version__}")
 
-if np.sum(np.abs(pca['Si'][1]-pca_match['Si'][1]))/np.sum(np.abs(pca_match['Si'][1])) < 1:
-    print(f"pca 2nd component passed : sum value ratio {np.sum(np.abs(pca['Si'][1]-pca_match['Si'][1]))/np.sum(np.abs(pca_match['Si'][1]))}")
+if not (np.abs(pca['Si'][1]-pca_match['Si'][1])  < 1E-10).all():
+    print(f"pca 2nd component passed, difference under 1E-10")
 else:
-    print(f"Ratio {np.sum(np.abs(pca['Si'][1]-pca_match['Si'][1]))/np.sum(np.abs(pca_match['Si'][1]))}")
     print("Difference")
     print(f"{pca['Si'][1] - pca_match['Si'][1]}")
     raise Exception(f"pca generated different value at 2nd component, sklearn version : {sklearn.__version__}")
 
-if np.sum(np.abs(pca['Si'][2]-pca_match['Si'][2]))/np.sum(np.abs(pca_match['Si'][2])) < 1:
-    print(f"pca 3rd component passed : sum value ratio {np.sum(np.abs(pca['Si'][2]-pca_match['Si'][2]))/np.sum(np.abs(pca_match['Si'][2]))}")
+
+if not (np.abs(pca['Si'2[0]-pca_match['Si'][2])  < 1E-10).all():
+    print(f"pca 3rd component passed, difference under 1E-10")
 else:
-    print(f"Ratio {np.sum(np.abs(pca['Si'][2]-pca_match['Si'][2]))/np.sum(np.abs(pca_match['Si'][2]))}")
     print("Difference")
     print(f"{pca['Si'][2] - pca_match['Si'][2]}")
     raise Exception(f"pca generated different value at 3rd component, sklearn version : {sklearn.__version__}")

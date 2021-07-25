@@ -33,7 +33,7 @@ print("pca generate done")
 pca_match = torch.load(f"{rootdir}pca_match")
 print("Checking generated pca match ")
 
-if (np.abs(pca['Si'][0][20:]-pca_match['Si'][0][20:])  < 1E-10).all():
+if (np.abs(pca['Si'][0][:20]-pca_match['Si'][0][:20])  < 1E-10).all():
     print(f"pca 1st component passed, difference under 1E-10")
 else:
     print("Difference")

@@ -7,6 +7,8 @@ from simple_nn_v2.features.symmetry_function import generating
 from simple_nn_v2.features.symmetry_function import utils as symf_utils
 from simple_nn_v2.features.symmetry_function._libsymf import lib, ffi
 from simple_nn_v2.utils import features as util_ft
+from simple_nn_v2.features.symmetry_function.mpi import DummyMPI
+
 
 # Minimum Setting for Testing Symmetry_function methods
 # Initialize input file, set Simple_nn object as parent of Symmetry_function object
@@ -49,8 +51,8 @@ cell_p  = util_ft._gen_2Darray_for_ffi(cell, ffi)
 # 4. initialize result and symmetry function variables
 idx = 1
 result = generating._initialize_result(atoms_per_type, structure_tags, structure_weights, idx, atom_type_idx)
-jtem = 'Si'
-cal_atom_idx, cal_atom_num, x, dx, da = generating._initialize_symmetry_function_variables(atom_idx_per_type, jtem, symf_params_set, atom_num, mpi_range = None )
+element = 'Si'
+cal_atom_idx, cal_atom_num, x, dx, da = generating._initialize_symmetry_function_variables(atom_idx_per_type, element, symf_params_set, atom_num, mpi_range = None )
 cal_atom_idx_p = ffi.cast("int *", cal_atom_idx.ctypes.data)
 x_p = util_ft._gen_2Darray_for_ffi(x, ffi)
 dx_p = util_ft._gen_2Darray_for_ffi(dx, ffi)
@@ -58,8 +60,8 @@ da_p = util_ft._gen_2Darray_for_ffi(da, ffi)
 
 # 5. calculate symmetry function
 errno = lib.calculate_sf(cell_p, cart_p, scale_p, atom_type_idx_p, atom_num,\
-        cal_atom_idx_p, cal_atom_num, symf_params_set[jtem]['int_p'],\
-        symf_params_set[jtem]['double_p'], symf_params_set[jtem]['num'],\
+        cal_atom_idx_p, cal_atom_num, symf_params_set[element]['int_p'],\
+        symf_params_set[element]['double_p'], symf_params_set[element]['num'],\
         x_p, dx_p, da_p)
 
 """ Main test code
@@ -70,7 +72,9 @@ errno = lib.calculate_sf(cell_p, cart_p, scale_p, atom_type_idx_p, atom_num,\
     3. check if 'E', 'F', 'S' value extract correctly
 
 """
-generating._set_calculated_result(result, x, dx, da, atoms_per_type, jtem, symf_params_set, atom_num)
+
+comm = DummyMPI()
+generating._set_calculated_result(inputs, result, x, dx, da, atoms_per_type, element, symf_params_set, atom_num, comm)
 
 print(result)
 print("1. check if 'N', 'tot_num', 'struct_type', 'struct_weight', 'atom_idx' are identical to test3 results")
@@ -92,7 +96,7 @@ print('da: ', result['da']['Si'][0])
 
 
 print("\n3. check if 'E', 'F', 'S' value extract correctly")
-E, F, S = generating._extract_EFS(inputs, structure, logfile)
+E, F, S = generating._extract_EFS(inputs, structure, logfile, comm)
 print('E= %s'%E)
 for i in range(len(F)):
     if i==0:

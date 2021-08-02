@@ -42,6 +42,8 @@ def test():
         else:
             raise Exception(f'TEST {number+1} : in {test} error occured.')
     print("Testing preprocess done")
+    if os.path.exists('LOG'):
+        os.remove('LOG')
 
 
 

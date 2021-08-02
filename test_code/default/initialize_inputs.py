@@ -11,6 +11,8 @@ rootdir='./test_input/'
 print(f"read {rootdir}input_test.yaml")
 inputs = init_inputs.initialize_inputs(rootdir+'input_test.yaml', logfile)
 
+
+#torch.save(inputs,rootdir+"inputs_match")
 print(f"load pregenerated result {rootdir}inputs_match")
 inputs_match = torch.load(rootdir+"inputs_match")
 

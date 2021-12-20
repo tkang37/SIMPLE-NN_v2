@@ -1,7 +1,6 @@
 generate_features: True
 preprocess: False
 train_model: False
-random_seed: False
 
 params:
     species1:   'your/dir/to/parameter/species1'
@@ -28,25 +27,20 @@ preprocessing:
     valid_list:         'valid_list' 
     shuffle:            True
     valid_rate:         0.1
-    #PCA parameters
-    calc_pca:           True
-    pca_whiten:         True
-    pca_min_whiten_level: 1.0e-8
     #Scaling parameters
     calc_scale:         True
     scale_type:         'minmax'
     scale_width:        1.0
-    scale_rho:
-        species1:       0.03
-        species2:       0.03
-    #GDF
-    calc_gdf:           False
-    atomic_weights: 
+    #PCA parameters
+    calc_pca:           True
+    pca_whiten:         True
+    pca_min_whiten_level: 1.0e-8
+    #Atomic weights
+    calc_atomic_weights: 
         type:            'gdf'
         params: 
-            sigma:
-                species1: 0.02
-                species2: 0.06
+            species1: 0.02
+            species2: 0.06
 #Input for traning
 neural_network:
     train_list:         'train_list'
@@ -82,7 +76,7 @@ neural_network:
     optimizer:
         method: 'Adam'
     # Loss function related
-    E_loss_type:        0
+    E_loss_type:        1
     F_loss_type:        1
     # Logging & saving related (Epoch)
     show_interval:          1
@@ -94,9 +88,9 @@ neural_network:
     #Using Preprocess option
     pca:    True
     scale:  True
-    gdf:    False
+    atomic_weights:    False
     weight_modifier: 
-        type:           'modified_sigmoid'
+        type:           'modified sigmoid'
         params: 
             species1:
                 b:  100

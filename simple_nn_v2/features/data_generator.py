@@ -94,8 +94,9 @@ def parse_structure_list(logfile, structure_list, comm):
                         structure_tag_idx.append(structure_tags.index(tag))
                 except:
                     err = "Unexpected line format in [str_list]"
-                    logfile.write("\nError: {:}\n".format(err))
-                    logfile.write("ERROR LINE: {:}\n".format(line))
+                    if comm.rank == 0:
+                        logfile.write("\nError: {:}\n".format(err))
+                        logfile.write("ERROR LINE: {:}\n".format(line))
                     raise NotImplementedError(err)
 
     return structure_tags, structure_weights, structure_file_list, structure_slicing_list, structure_tag_idx
@@ -145,10 +146,10 @@ def load_structures(inputs, structure_file, structure_slicing, logfile, comm):
         if inputs['descriptor']['compress_outcar']:
             if comm.rank == 0:
                 file_path = compress_outcar(structure_file)
-            file_path = comm.bcast(file_path, 0);
+            file_path = comm.bcast(file_path, root=0);
 
         if ase.__version__ >= '3.18.0':
-            structures = io.read(file_path, index=index, format=inputs['descriptor']['refdata_format'], parallel=False if comm.rank == 1 else True)
+            structures = io.read(file_path, index=index, format=inputs['descriptor']['refdata_format'], parallel=False)
         else:
             structures = io.read(file_path, index=index, format=inputs['descriptor']['refdata_format'], force_consistent=True, parallel=False)
     else:
@@ -181,7 +182,8 @@ def save_to_datafile(inputs, data, data_idx, logfile):
         torch.save(data, tmp_filename)
     except:
         err = "Unexpected error during save data to .pt file"
-        logfile.write("\nError: {:}\n".format(err))
+        if comm.rank == 0:
+            logfile.write("\nError: {:}\n".format(err))
         raise NotImplementedError(err)
 
     return tmp_filename

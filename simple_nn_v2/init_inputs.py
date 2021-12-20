@@ -4,6 +4,7 @@ import yaml
 import collections
 import torch
 import numpy as np
+import time
 
 default_inputs = {
     'generate_features': True,
@@ -47,8 +48,7 @@ preprocess_default_inputs = \
                 'scale_width': 1.0,
                 'scale_rho' : None,
                 #GDF
-                'calc_gdf'  : False,
-                'atomic_weights': {
+                'calc_atomic_weights': {
                     'type'  : None,
                     'params': dict(),
                 },
@@ -122,7 +122,7 @@ model_default_inputs = \
                 #Using preprocessing results
                 'pca'   : True,
                 'scale' : True,
-                'gdf'   : False,
+                'atomic_weights'   : False,
                 #GDF weight modifier
                 'weight_modifier': {
                     'type'  : None,
@@ -149,7 +149,7 @@ def initialize_inputs(input_file_name, logfile):
     else:
         descriptor_type = 'symmetry_function'
     params_type = input_yaml['params']
-               
+
     inputs = default_inputs
 
     for key in list(params_type.keys()):
@@ -157,7 +157,6 @@ def initialize_inputs(input_file_name, logfile):
 
     descriptor_default_inputs = get_descriptor_default_inputs(logfile, descriptor_type=descriptor_type)
     inputs = _deep_update(inputs, descriptor_default_inputs)
-
     inputs = _deep_update(inputs, preprocess_default_inputs)
     inputs = _deep_update(inputs, model_default_inputs)
     # update inputs using 'input.yaml'
@@ -176,18 +175,20 @@ def initialize_inputs(input_file_name, logfile):
 
     if len(inputs['atom_types']) == 0:
         raise KeyError
-    if not inputs['neural_network']['use_force'] and \
-            inputs['preprocessing']['atomic_weights']['type'] is not None:
-        logfile.write("Warning: Force training is off but atomic weights are given. Atomic weights will be ignored.\n")
+    if not inputs['neural_network']['use_force'] and isinstance(inputs['preprocessing']['calc_atomic_weights'], dict):
+        if inputs['preprocessing']['calc_atomic_weights']['type'] is not None:
+            logfile.write("Warning: Force training is off but atomic weights are given. Atomic weights will be ignored.\n")
     if inputs['neural_network']['optimizer']['method'] == 'L-BFGS' and \
             not inputs['neural_network']['full_batch']:
         logfile.write("Warning: Optimization method is L-BFGS but full batch mode is off. This might results bad convergence or divergence.\n")
 
-    if inputs['random_seed'] is not None:
-        seed = inputs['random_seed']
-        torch.manual_seed(seed)
-        np.random.seed(seed)
-        logfile.write("*** Random seed: {0:} ***\n".format(seed))
+    if inputs['random_seed'] is None:
+        inputs["random_seed"] = int(time.time()) 
+
+    inputs['neural_network']['energy_coeff'] = float(inputs['neural_network']['energy_coeff'])
+    inputs['neural_network']['force_coeff'] = float(inputs['neural_network']['force_coeff'])
+    inputs['neural_network']['stress_coeff'] = float(inputs['neural_network']['stress_coeff'])
+
 
     return inputs
 
@@ -198,7 +199,6 @@ def get_descriptor_default_inputs(logfile, descriptor_type='symmetry_function'):
 
     if descriptor_type not in descriptor_inputs.keys():
         err = "'{}' type descriptor is not implemented.".format(descriptor_type)
-        logfile.write("\nError: {:}\n".format(err))
         raise NotImplementedError(err)
 
     return descriptor_inputs[descriptor_type]
@@ -222,7 +222,7 @@ def _deep_update(source, overrides, warn_new_key=False, logfile=None, depth=0, p
             if warn_new_key and depth < 2 and key not in source:
                 logfile.write("Warning: Unidentified option in {:}: {:}\n".format(parent, key))
             if isinstance(overrides[key], collections.Mapping) and overrides[key]:
-                returned = _deep_update(source.get(key, {}), overrides[key],
+                returned = _deep_update(source.get(key, {}), overrides[key], 
                                        warn_new_key=warn_new_key, logfile=logfile,
                                        depth=depth+1, parent=key)
                 source[key] = returned
@@ -234,9 +234,11 @@ def _deep_update(source, overrides, warn_new_key=False, logfile=None, depth=0, p
     return source
 
 def check_inputs(inputs, logfile, run_type, error=False):
+    errno = 0
+    err = None
     atom_types = inputs['atom_types']
     #Check input valid and write log
-    logfile.write("\n----------------------------------------------------------------------------------------------\n")
+    logfile.write("\n----------------------------------------------------------------------------------------\n")
     if run_type  == 'generate':
         logfile.write("\nInput for descriptor\n")
         descriptor = inputs['descriptor']
@@ -245,7 +247,8 @@ def check_inputs(inputs, logfile, run_type, error=False):
         if error: assert set(atom_types)  == set(params.keys()), f"atom_types not consistant with params : {set(atom_types).symmetric_difference(params.keys())} "
         for atype in atom_types:
             if not os.path.exists(params[atype]):
-                raise Exception(f"In params {params[atype]:2} file not exist for {atype}")
+                errno = 1
+                err = f"In params {params[atype]:2} file not exist for {atype}"
             else:
                 logfile.write(f"{atype:2} parameters directory     : {params[atype]}\n")
         logfile.write(f"reference data format       : {descriptor['refdata_format']}\n")
@@ -258,6 +261,7 @@ def check_inputs(inputs, logfile, run_type, error=False):
         logfile.write(f"read force from data        : {descriptor['read_force']}\n")
         logfile.write(f"read stress from data       : {descriptor['read_stress']}\n")
         logfile.write(f"save dx as sparse tensor    : {descriptor['dx_save_sparse']}\n")
+        logfile.flush()
     #Check prerpcess input is valid and write log
     elif run_type  == 'preprocess':
         preprocessing = inputs['preprocessing']
@@ -268,7 +272,8 @@ def check_inputs(inputs, logfile, run_type, error=False):
             {set(atom_types).symmetric_difference(params.keys())} "
             for atype in atom_types:
                 if not os.path.exists(params[atype]):
-                    raise Exception(f"In params {params[atype]} file not exist for {atype}")
+                    errno = 1
+                    err = f"In params {params[atype]:2} file not exist for {atype}"
                 else:
                     logfile.write(f"{atype:2} parameters directory     : {params[atype]}\n")
         logfile.write(f"total data list             : {preprocessing['data_list']}\n")
@@ -291,20 +296,21 @@ def check_inputs(inputs, logfile, run_type, error=False):
             logfile.write(f"use pca whitening           : {preprocessing['pca_whiten']}\n")
             if preprocessing['pca_whiten']:
                 logfile.write(f"pca min whitening level     : {preprocessing['pca_min_whiten_level']}\n")
-        logfile.write(f"calc GDF for atomic weight  : {preprocessing['calc_gdf']}\n")
-        if preprocessing['calc_gdf']:
-            if preprocessing['atomic_weights']['type']:
-                logfile.write(f"atomic_weights type         : {preprocessing['atomic_weights']['type']}\n")
-                if preprocessing['atomic_weights']['params']:
-                    if 'sigma' in preprocessing['atomic_weights']['params'].keys():
-                        if isinstance(preprocessing['atomic_weights']['params']['sigma'],dict):
-                            for key, value in preprocessing['atomic_weights']['params']['sigma'].items():
-                                logfile.write(f"sigma for {key:2}                : {value}\n")
-                        else:
-                            logfile.write(f"params                       : {preprocessing['atomic_weights']['params']['sigma']}\n")
-
-            elif preprocessing['atomic_weights']['type']  not in ['gdf', 'user', 'file']:
-                logfile.write("Warning : set atomic weight types approatly. preprocessing.atomic_weights.type : gdf/user/file\n")
+        if preprocessing['calc_atomic_weights']:
+            logfile.write(f"calc_atomic_weights         : True\n")
+            if preprocessing['calc_atomic_weights']['type'] in ['gdf', 'user']:
+                logfile.write(f"atomic_weights type         : {preprocessing['calc_atomic_weights']['type']}\n")
+                if preprocessing['calc_atomic_weights']['params']:
+                    if isinstance(preprocessing['calc_atomic_weights']['params'], dict):
+                        for key, value in preprocessing['calc_atomic_weights']['params'].items():
+                            logfile.write(f"sigma for {key:2}                : {value}\n")
+                    else:
+                        logfile.write(f"params                       : {preprocessing['calc_atomic_weights']['params']}\n")
+            else:
+                logfile.write("Warning : set atomic weight types appropriately. preprocessing.atomic_weights.type : gdf/user\n")
+        else:
+            logfile.write(f"calc_atomic_weights         : {preprocessing['calc_atomic_weights']}\n")
+        logfile.flush()
 
     #Check train model input is valid and write log
     elif run_type  == 'train_model':
@@ -316,7 +322,8 @@ def check_inputs(inputs, logfile, run_type, error=False):
             {set(atom_types).symmetric_difference(params.keys())} "
             for atype in atom_types:
                 if not os.path.exists(params[atype]):
-                    raise Exception(f"In params {params[atype]} file not exist for {atype}")
+                    errno = 1
+                    err = f"In params {params[atype]:2} file not exist for {atype}"
                 else:
                     logfile.write(f"{atype:2} parameters directory         : {params[atype]}\n")
  
@@ -366,8 +373,8 @@ def check_inputs(inputs, logfile, run_type, error=False):
                 if error: assert  os.path.exists(neural_network['scale']), f"{neural_network['scale']} file not exist.. set pca = False or make pca file\n"
             else:
                 if error: assert  os.path.exists('./scale_factor'), f"./scale_factor file not exist.. set scale = False or make scale_factor file\n"
-        logfile.write(f"use gdf in traning              : {neural_network['gdf']}\n")
-        if neural_network['gdf']:
+        logfile.write(f"use atomic_weights in traning   : {neural_network['atomic_weights']}\n")
+        if neural_network['atomic_weights']:
             if neural_network['weight_modifier']['type'] != 'modified sigmoid':
                 logfile.write("Warning: We only support 'modified sigmoid'\n")
             else:
@@ -443,20 +450,22 @@ def check_inputs(inputs, logfile, run_type, error=False):
             logfile.write(f"Use GPU device number           : {neural_network['GPU_number']}\n")
             if error: assert neural_network['GPU_number'] <= torch.cuda.device_count()-1,\
              f"Invalid GPU device number available GPU # {torch.cuda.device_count()-1} , set number {neural_network['GPU_number']} "
-    logfile.write('\n----------------------------------------------------------------------------------------------\n')
+        logfile.flush()
+    logfile.write('\n----------------------------------------------------------------------------------------\n')
     logfile.flush()
+    return errno, err
 
 def _to_boolean(inputs):
     check_list =  ['generate_features', 'preprocess',  'train_model']
     descriptor_list = ['compress_outcar','read_force','read_stress', 'dx_save_sparse', 'add_atom_idx', 'absolute_path']
-    preprocessing_list = ['shuffle', 'calc_pca', 'pca_whiten', 'calc_scale', 'calc_gdf']
+    preprocessing_list = ['shuffle', 'calc_pca', 'pca_whiten', 'calc_scale']
 
     neural_network_list = ['train', 'test', 'add_NNP_ref', 'train_atomic_E', 'shuffle_dataloader', 'double_precision', 'use_force', 'use_stress',\
-                        'dropout','full_batch', 'checkpoint_interval', 'print_structure_rmse', 'accurate_train_rmse', 'pca', 'scale', 'gdf',\
+                        'dropout','full_batch', 'checkpoint_interval', 'print_structure_rmse', 'accurate_train_rmse', 'pca', 'scale', 'atomic_weights',\
                         'clear_prev_status', 'clear_prev_optimizer', 'load_data_to_gpu']
 
 
-    #True TRUE T t true TrUe .T. ... 
+    #True TRUE T tatrue TrUe .T. ... 
     #False FALSE F f false FaLse .F. ... 
     def convert(dic, dic_key):
         check = dic[dic_key].upper()

@@ -13,8 +13,8 @@ amorphous SiO\ :sub:`2`\  (72 atoms) are used as training set.
 GDF weighting
 =============
 
-Tuning the weight of atomic force in loss function can be used to reduce the force errors of the sprasely sampled atoms.
-Gaussian densigy function (GDF) weighting [#f1]_ is one of the methods, which suggests the gaussian type of weighting scheme. 
+Tuning the weight of atomic force in loss function can be used to reduce the force errors of the sparsely sampled atoms.
+Gaussian density function (GDF) weighting [#f1]_ is one of the methods, which suggests the gaussian type of weighting scheme. 
 To use GDF, you need to calculate the :math:`\rho(\mathbf{G})` 
 by adding the following lines to the ``symmetry_function`` section in ``input.yaml``.
 SIMPLE-NN supports automatic parameter generation scheme for :math:`\sigma` and :math:`c`.
